@@ -15,7 +15,7 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173","http://localhost:5174"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:5173","http://localhost:5174","https://aura-review-frontend-inslkdu3v-personal-5157.vercel.app"));
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowedHeaders(Arrays.asList("Content-Type"));
         config.setAllowCredentials(true);

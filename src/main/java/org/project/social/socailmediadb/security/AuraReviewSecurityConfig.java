@@ -102,7 +102,7 @@ SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173","http://localhost:5174"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:5173","http://localhost:5174","https://aura-review-frontend-inslkdu3v-personal-5157.vercel.app"));
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));
         config.setAllowCredentials(true);
