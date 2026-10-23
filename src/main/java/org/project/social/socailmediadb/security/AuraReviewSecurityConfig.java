@@ -106,7 +106,8 @@ SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "http://localhost:5174",
-                "https://aura-review-frontend-inslkdu3v-personal-5157.vercel.app"
+                "https://aura-review-frontend-inslkdu3v-personal-5157.vercel.app",
+                    "https://aura-review-frontend-git-main-personal-5157.vercel.app"
         ));
 
         config.setAllowedMethods(Arrays.asList(
