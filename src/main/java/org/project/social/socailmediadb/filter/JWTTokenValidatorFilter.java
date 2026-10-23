@@ -28,43 +28,63 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> publicPaths;
 
+@Override
+protected void doFilterInternal(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain filterChain)
+        throws ServletException, IOException {
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        String authHeader = request.getHeader(ApplicationConstants.JWT_HEADER);
-        if (null != authHeader) {
-            try {
-                // Extract the JWT token
-                String jwt = authHeader.substring(7); // Remove 'Bearer ' prefix
-                Environment env = getEnvironment();
-                if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-    filterChain.doFilter(request, response);
-    return;
-}
-                if (null != env) {
-                    String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
-                            ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
-                    SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-                    if (null != secretKey) {
-                        Claims claims = Jwts.parser().verifyWith(secretKey)
-                                .build().parseSignedClaims(jwt).getPayload();
-                        String username = String.valueOf(claims.get("email"));
-                        Authentication authentication = new UsernamePasswordAuthenticationToken(username,
-                                null, Collections.emptyList());
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
-                }
-
-            } catch (Exception exception) {
-                throw new BadCredentialsException("Invalid Token received!");
-            }
-        }
+    // Allow browser CORS preflight requests before JWT validation
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
         filterChain.doFilter(request, response);
-
+        return;
     }
 
+    String authHeader = request.getHeader(ApplicationConstants.JWT_HEADER);
+
+    if (authHeader != null) {
+        try {
+            if (!authHeader.startsWith("Bearer ")) {
+                throw new BadCredentialsException("Invalid Authorization header");
+            }
+
+            String jwt = authHeader.substring(7);
+            Environment env = getEnvironment();
+
+            if (env != null) {
+                String secret = env.getProperty(
+                        ApplicationConstants.JWT_SECRET_KEY,
+                        ApplicationConstants.JWT_SECRET_DEFAULT_VALUE
+                );
+
+                SecretKey secretKey = Keys.hmacShaKeyFor(
+                        secret.getBytes(StandardCharsets.UTF_8)
+                );
+
+                Claims claims = Jwts.parser()
+                        .verifyWith(secretKey)
+                        .build()
+                        .parseSignedClaims(jwt)
+                        .getPayload();
+
+                String username = String.valueOf(claims.get("email"));
+
+                Authentication authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                username, null, Collections.emptyList()
+                        );
+
+                SecurityContextHolder.getContext()
+                        .setAuthentication(authentication);
+            }
+        } catch (Exception exception) {
+            throw new BadCredentialsException("Invalid Token received!");
+        }
+    }
+
+    filterChain.doFilter(request, response);
+}
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request)
             throws ServletException {
