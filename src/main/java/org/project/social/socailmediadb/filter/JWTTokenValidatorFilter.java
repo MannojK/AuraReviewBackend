@@ -39,6 +39,10 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
                 // Extract the JWT token
                 String jwt = authHeader.substring(7); // Remove 'Bearer ' prefix
                 Environment env = getEnvironment();
+                if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+    filterChain.doFilter(request, response);
+    return;
+}
                 if (null != env) {
                     String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
                             ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
