@@ -33,24 +33,28 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class AuraReviewSecurityConfig {
     private final List<String> publicPaths;
 
-    @Bean
-    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
-            throws Exception {
-        return http.csrf(csrfConfig -> csrfConfig.disable())
-                .cors(corsConfig -> corsConfig.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests((requests) -> {
-                            publicPaths.forEach(path ->
-                                    requests.requestMatchers(path).permitAll()
-                                            .requestMatchers("/api/v1/auth/**").permitAll()
-                            );
+ @Bean
+SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
+        throws Exception {
 
-                            requests.anyRequest().authenticated();
-                        }
-                )
-                .addFilterBefore(new JWTTokenValidatorFilter(publicPaths), BasicAuthenticationFilter.class)
-                .formLogin(withDefaults())
-                .httpBasic(withDefaults()).build();
-    }
+    return http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .authorizeHttpRequests(requests -> {
+                requests.requestMatchers("/api/v1/auth/**").permitAll();
+
+                publicPaths.forEach(path ->
+                        requests.requestMatchers(path).permitAll()
+                );
+
+                requests.anyRequest().authenticated();
+            })
+            .addFilterBefore(
+                    new JWTTokenValidatorFilter(publicPaths),
+                    BasicAuthenticationFilter.class
+            )
+            .build();
+}
 
 //    @Bean
 //    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
