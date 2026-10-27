@@ -109,7 +109,7 @@ SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
                 "https://aura-review-frontend-inslkdu3v-personal-5157.vercel.app",
                     "https://aura-review-frontend-git-main-personal-5157.vercel.app",
                     "https://aura-review-frontend.vercel.app"
-        ));
+));
 
         config.setAllowedMethods(Arrays.asList(
                 "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
